@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dashboard - LinkedOut</title>
+<link rel="icon" href="logo.png">
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <!-- Navbar -->
+  <header>
+    <a href="index.html"><img src="logo.png" alt="LinkedOut logo" class="logo"></a>
+    <nav>
+      <a href="#applications">Applications</a>
+      <a href="#recommended">Jobs</a>
+      <a href="#profile">Profile</a>
+      <a href="index.html">Logout</a>
+    </nav>
+  </header>
+
+  <!-- Welcome -->
+  <section>
+    <h2>Welcome back, Aarav</h2>
+
+    <!-- Stats -->
+    <div class="row">
+      <div class="box stat">
+        <h1>24</h1>
+        <p>Jobs Applied</p>
+      </div>
+      <div class="box stat">
+        <h1>4</h1>
+        <p>Interviews</p>
+      </div>
+      <div class="box stat">
+        <h1>3</h1>
+        <p>Saved Jobs</p>
+      </div>
+      <div class="box stat">
+        <h1>78%</h1>
+        <p>Profile Complete</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- My Applications table -->
+  <section id="applications">
+    <h2>My Applications</h2>
+    <table>
+      <tr>
+        <th>Company</th>
+        <th>Position</th>
+        <th>Date</th>
+        <th>Status</th>
+      </tr>
+      <tr>
+        <td>Northwind Labs</td>
+        <td>Product Designer</td>
+        <td>28 Sep 2026</td>
+        <td class="interview">Interview Scheduled</td>
+      </tr>
+      <tr>
+        <td>Helio Pay</td>
+        <td>Frontend Engineer</td>
+        <td>26 Sep 2026</td>
+        <td class="shortlist">Shortlisted</td>
+      </tr>
+      <tr>
+        <td>Corvid Analytics</td>
+        <td>Data Analyst</td>
+        <td>24 Sep 2026</td>
+        <td class="review">Under Review</td>
+      </tr>
+      <tr>
+        <td>Meridian Health</td>
+        <td>UX Researcher</td>
+        <td>21 Sep 2026</td>
+        <td class="applied">Applied</td>
+      </tr>
+      <tr>
+        <td>Brightloop</td>
+        <td>Product Manager</td>
+        <td>18 Sep 2026</td>
+        <td class="rejected">Rejected</td>
+      </tr>
+    </table>
+  </section>
+
+  <!-- Recommended jobs -->
+  <section id="recommended">
+    <h2>Recommended Jobs</h2>
+    <div class="row">
+      <div class="box">
+        <h3>Senior Product Designer</h3>
+        <p>Northwind Labs, Bengaluru</p>
+        <p>Salary: 28-38 LPA</p>
+        <a href="#applications" class="btn">Apply</a>
+      </div>
+      <div class="box">
+        <h3>Full-Stack Engineer</h3>
+        <p>Helio Pay, Remote</p>
+        <p>Salary: 24-34 LPA</p>
+        <a href="#applications" class="btn">Apply</a>
+      </div>
+      <div class="box">
+        <h3>Technical Recruiter</h3>
+        <p>Atlas Staffing, Bhopal</p>
+        <p>Salary: 9-14 LPA</p>
+        <a href="#applications" class="btn">Apply</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Profile -->
+  <section id="profile">
+    <h2>My Profile</h2>
+    <div class="box">
+      <h3>Aarav Sharma</h3>
+      <p>B.Tech, Computer Science (2022-2026), Bhopal</p>
+      <p><b>Skills:</b></p>
+      <div class="skills">
+        <span>Figma</span>
+        <span>React</span>
+        <span>SQL</span>
+        <span>Python</span>
+        <span>Teamwork</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    &copy; 2026 LinkedOut
+  </footer>
+
+</body>
+</html>

@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Candidate Portal - LinkedOut</title>
+<link rel="icon" href="logo.png">
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <header>
+    <a href="index.html"><img src="logo.png" alt="LinkedOut logo" class="logo"></a>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="#" id="logoutBtn" hidden>Logout</a>
+    </nav>
+  </header>
+
+  <!-- ===== Not logged in: login / create profile ===== -->
+  <section id="auth">
+    <h2>Candidate Portal</h2>
+    <div class="tabs">
+      <button type="button" class="tab active" data-tab="login">Login</button>
+      <button type="button" class="tab" data-tab="register">Create Profile</button>
+    </div>
+
+    <form id="loginForm" data-panel="login">
+      <div class="field">
+        <label>Email</label>
+        <input type="email" name="email" placeholder="you@example.com" required>
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input type="password" name="password" placeholder="Your password" required>
+      </div>
+      <button type="submit" class="btn">Login</button>
+      <a href="#" id="forgot" class="forgot">Forgot password?</a>
+    </form>
+
+    <form id="registerForm" class="wide" data-panel="register" hidden>
+      <div class="grid2">
+        <div class="field">
+          <label>Full name <span class="req">*</span></label>
+          <input type="text" name="fullName" required>
+        </div>
+        <div class="field">
+          <label>Email <span class="req">*</span></label>
+          <input type="email" name="email" placeholder="you@example.com" required>
+        </div>
+        <div class="field">
+          <label>Password <span class="req">*</span></label>
+          <input type="password" name="password" placeholder="At least 8 characters" minlength="8" required>
+        </div>
+        <div class="field">
+          <label>Phone</label>
+          <input type="tel" name="phone" placeholder="+91 98765 43210">
+        </div>
+        <div class="field">
+          <label>Location</label>
+          <input type="text" name="location" placeholder="City">
+        </div>
+        <div class="field">
+          <label>Education</label>
+          <input type="text" name="education" placeholder="B.Tech, Computer Science (2022-2026)">
+        </div>
+        <div class="field full">
+          <label>Skills (comma separated)</label>
+          <input type="text" name="skills" placeholder="Figma, React, SQL, Python">
+        </div>
+        <div class="field full">
+          <label>About you</label>
+          <textarea name="summary" placeholder="A short summary about yourself"></textarea>
+        </div>
+        <div class="field full">
+          <label>Resume <span class="req">*</span></label>
+          <input type="file" name="resume" accept=".pdf,.doc,.docx" required>
+          <p class="hint">Required. PDF, DOC or DOCX, up to 1.5 MB.</p>
+        </div>
+      </div>
+      <button type="submit" class="btn">Create Profile</button>
+    </form>
+    <div class="social">
+      <p>or continue with</p>
+      <button type="button" class="btn" data-provider="google">Continue with Google</button>
+      <button type="button" class="btn" data-provider="linkedin">Continue with LinkedIn</button>
+    </div>
+  </section>
+
+  <!-- ===== Logged in: candidate dashboard ===== -->
+  <div id="portal" hidden>
+    <section>
+      <h2 id="welcome">Welcome</h2>
+      <div class="row">
+        <div class="box stat"><h1 id="statApplied">0</h1><p>Jobs Applied</p></div>
+        <div class="box stat"><h1 id="statShortlisted">0</h1><p>Shortlisted</p></div>
+        <div class="box stat"><h1 id="statInterviews">0</h1><p>Interviews</p></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="tabs">
+        <button type="button" class="tab active" data-tab="jobs">Browse Jobs</button>
+        <button type="button" class="tab" data-tab="applications">My Applications</button>
+        <button type="button" class="tab" data-tab="profile">My Profile</button>
+      </div>
+
+      <!-- Browse jobs -->
+      <div data-panel="jobs">
+        <div class="toolbar">
+          <input type="text" id="jobSearch" placeholder="Search by title, skill, company or location">
+        </div>
+        <div class="cards" id="jobList"></div>
+      </div>
+
+      <!-- Applications -->
+      <div data-panel="applications" hidden>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Company</th><th>Position</th><th>Date</th><th>Status</th><th>Meeting</th></tr>
+            </thead>
+            <tbody id="appRows"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Update profile -->
+      <div data-panel="profile" hidden>
+        <form id="profileForm" class="wide">
+          <div class="grid2">
+            <div class="field">
+              <label>Full name <span class="req">*</span></label>
+              <input type="text" name="fullName" required>
+            </div>
+            <div class="field">
+              <label>Email</label>
+              <input type="email" name="email" disabled>
+            </div>
+            <div class="field">
+              <label>New password</label>
+              <input type="password" name="password" placeholder="Leave blank to keep current">
+            </div>
+            <div class="field">
+              <label>Phone</label>
+              <input type="tel" name="phone">
+            </div>
+            <div class="field">
+              <label>Location</label>
+              <input type="text" name="location">
+            </div>
+            <div class="field">
+              <label>Education</label>
+              <input type="text" name="education">
+            </div>
+            <div class="field full">
+              <label>Skills (comma separated)</label>
+              <input type="text" name="skills">
+            </div>
+            <div class="field full">
+              <label>About you</label>
+              <textarea name="summary"></textarea>
+            </div>
+            <div class="field full">
+              <label>Resume</label>
+              <p class="hint" id="currentResume"></p>
+              <input type="file" name="resume" accept=".pdf,.doc,.docx">
+              <p class="hint">Choose a file only if you want to replace your current resume.</p>
+            </div>
+          </div>
+          <button type="submit" class="btn">Save Changes</button>
+        </form>
+      </div>
+    </section>
+  </div>
+
+  <footer>
+    &copy; 2026 LinkedOut
+  </footer>
+
+  <script src="app.js"></script>
+  <script src="candidate.js"></script>
+</body>
+</html>
