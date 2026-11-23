@@ -430,3 +430,73 @@ form .btn.btn-small { width: auto; margin-top: 0; }
 }
 .social .btn:hover { border-color: var(--accent); background: var(--surface-2); box-shadow: none; }
 .forgot { display: block; text-align: center; margin-top: 14px; font-size: 13px; }
+
+/* ---------- Job cards: company > position > salary, each in its own colour ---------- */
+.job-card {
+  --c: #a78bfa;
+  position: relative; overflow: hidden; display: flex; flex-direction: column;
+  border-top: 3px solid var(--c);
+}
+.job-card::before {
+  content: ""; position: absolute; inset: 0 0 auto 0; height: 110px; pointer-events: none;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--c) 16%, transparent), transparent);
+}
+.co-row { display: flex; align-items: center; gap: 12px; position: relative; }
+.co-logo {
+  width: 46px; height: 46px; flex-shrink: 0; border-radius: 12px;
+  display: grid; place-items: center; font-size: 22px; font-weight: 800;
+  color: #17171a; background: var(--c);
+}
+.co-text { min-width: 0; flex: 1; }
+.job .co { margin: 0; font-size: 22px; font-weight: 800; line-height: 1.15; color: var(--c); }
+.co-sub { font-size: 13px; color: var(--muted); }
+.co-link { font-size: 13px; font-weight: 600; color: var(--c); text-decoration: none; white-space: nowrap; }
+.co-link:hover { text-decoration: underline; }
+.job .role { margin: 16px 0 10px; font-size: 17px; font-weight: 600; color: #fff; position: relative; }
+.salary {
+  display: inline-block; align-self: flex-start; position: relative;
+  font-size: 14px; font-weight: 700; padding: 5px 13px; border-radius: 999px;
+  color: #34d399; background: rgba(52, 211, 153, 0.12); border: 1px solid rgba(52, 211, 153, 0.35);
+}
+.job-card .skills { margin: 6px 0 4px; }
+.card-actions { margin-top: auto; padding-top: 14px; }
+.job-card .card-actions .btn { margin-top: 0; }
+
+/* ---------- Job details popup ---------- */
+.job-modal {
+  --c: #a78bfa;
+  position: relative; width: 100%; max-width: 660px; max-height: 90vh; overflow-y: auto;
+  background: var(--surface); border: 1px solid var(--border); border-top: 4px solid var(--c);
+  border-radius: var(--radius); padding: 28px; box-shadow: var(--shadow);
+  animation: jpop 0.35s cubic-bezier(0.2, 0.9, 0.3, 1) both;
+}
+@keyframes jpop { from { opacity: 0; transform: translateY(30px) scale(0.92); } to { opacity: 1; transform: none; } }
+.job-modal .co { margin: 0; font-size: 24px; font-weight: 800; color: var(--c); }
+.jm-role { margin: 16px 0 10px; font-size: 22px; color: #fff; text-align: left; }
+.jm-close {
+  position: absolute; top: 12px; right: 14px; width: 34px; height: 34px; border-radius: 50%;
+  background: var(--surface-2); color: var(--muted); border: 1px solid var(--border);
+  font-size: 22px; line-height: 1; cursor: pointer;
+}
+.jm-close:hover { color: white; border-color: var(--accent); }
+.jm-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 18px 0; }
+.jm-item { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 10px 14px; }
+.jm-item span { display: block; font-size: 11.5px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+.jm-item b { font-size: 15px; color: var(--text); }
+.jm-item.sal b { color: #34d399; }
+.jm-h { margin: 18px 0 4px; font-size: 14px; color: var(--accent-light); text-transform: uppercase; letter-spacing: 0.06em; }
+.jm-desc { margin: 6px 0 0; color: var(--muted); font-size: 15px; }
+.jm-note {
+  margin: 18px 0 0; padding: 10px 14px; font-size: 13px; color: #fbbf24;
+  background: rgba(251, 191, 36, 0.08); border: 1px solid rgba(251, 191, 36, 0.3); border-radius: 10px;
+}
+.jm-actions { margin-top: 22px; }
+.jm-actions .btn { margin-top: 0; }
+@media (max-width: 600px) { .jm-grid { grid-template-columns: 1fr; } .job-modal { padding: 22px 18px; } }
+
+/* Company name as a website link */
+.co-name { color: inherit; text-decoration: none; }
+.co-name::after { content: " \2197"; font-size: 0.6em; opacity: 0.75; }
+.co-name:hover { text-decoration: underline; text-underline-offset: 3px; }
+.co-link { padding: 4px 10px; border: 1px solid var(--c); border-radius: 999px; }
+.co-link:hover { background: color-mix(in srgb, var(--c) 15%, transparent); text-decoration: none; }

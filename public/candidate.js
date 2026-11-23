@@ -43,38 +43,37 @@
   }
 
   /* ---------- Jobs ---------- */
+  function applyBtn(j) {
+    return apps.some(a => a.jobId === j.id)
+      ? '<button class="btn btn-outline btn-small" disabled>Applied</button>'
+      : '<button class="btn btn-small" data-apply="' + esc(j.id) + '">Apply</button>';
+  }
+
   function renderJobs() {
     const q = $('#jobSearch').value.trim().toLowerCase();
     const list = jobs.filter(j =>
       !q || [j.title, j.company, j.location, j.skills].join(' ').toLowerCase().includes(q));
-    const applied = new Set(apps.map(a => a.jobId));
-
-    $('#jobList').innerHTML = list.length ? list.map(j => `
-      <div class="box job">
-        <div class="job-top">
-          <h3>${esc(j.title)}</h3>
-          ${j.type ? '<span class="badge">' + esc(j.type) + '</span>' : ''}
-        </div>
-        <p>${esc(j.company)}${j.location ? ', ' + esc(j.location) : ''}</p>
-        ${j.salary ? '<p>Salary: ' + esc(j.salary) + '</p>' : ''}
-        ${chips(j.skills)}
-        ${j.description ? '<p class="desc">' + esc(j.description) + '</p>' : ''}
-        ${applied.has(j.id)
-          ? '<button class="btn btn-outline" disabled>Applied</button>'
-          : '<button class="btn" data-apply="' + esc(j.id) + '">Apply</button>'}
-      </div>`).join('')
+    $('#jobList').innerHTML = list.length ? list.map(j => jobCard(j, applyBtn(j))).join('')
       : '<p class="empty">No jobs found. Jobs posted by recruiters will show up here.</p>';
   }
 
   $('#jobSearch').addEventListener('input', renderJobs);
 
-  $('#jobList').addEventListener('click', async e => {
+  /* Works for both the job cards and the "View more" popup */
+  document.addEventListener('click', async e => {
+    const more = e.target.dataset.more;
+    if (more) {
+      const j = jobs.find(x => String(x.id) === more);
+      if (j) showJob(j, applyBtn(j));
+      return;
+    }
     const id = e.target.dataset.apply;
     if (!id) return;
     e.target.disabled = true;
     const r = await api('/applications', { method: 'POST', body: { jobId: Number(id) } });
     if (r.error) { e.target.disabled = false; return toast(r.error, 'error'); }
     toast('Application sent!');
+    closeJobModal();
     await refresh();
     renderStats(); renderJobs(); renderApps();
   });

@@ -48,7 +48,8 @@
     const f = e.target, v = n => f.elements[n].value.trim();
     const r = await api('/jobs', { method: 'POST', body: {
       title: v('jobTitle'), location: v('location'), salary: v('salary'),
-      type: f.elements.jobType.value, skills: v('skills'), description: v('description') } });
+      type: f.elements.jobType.value, experience: v('experience'), qualification: v('qualification'),
+      skills: v('skills'), description: v('description') } });
     if (r.error) return toast(r.error, 'error');
     f.reset();
     await refresh(); renderJobs(); renderStats(); renderApplicants();
@@ -58,25 +59,17 @@
   function renderJobs() {
     $('#jobList').innerHTML = jobs.length ? jobs.map(j => {
       const n = apps.filter(a => a.jobId === j.id).length;
-      return `
-      <div class="box job">
-        <div class="job-top">
-          <h3>${esc(j.title)}</h3>
-          <span class="badge">${esc(j.type || 'Full-time')}</span>
-        </div>
-        <p>${esc(j.location)}${j.salary ? ' &middot; ' + esc(j.salary) : ''}</p>
-        ${chips(j.skills)}
-        ${j.description ? '<p class="desc">' + esc(j.description) + '</p>' : ''}
-        <p><b>${n}</b> applicant${n === 1 ? '' : 's'}</p>
-        <div class="actions">
-          <button class="btn btn-outline btn-small" data-view="${esc(j.id)}">View applicants</button>
-          <button class="btn btn-danger btn-small" data-delete="${esc(j.id)}">Delete</button>
-        </div>
-      </div>`;
+      return jobCard(j,
+        '<button class="btn btn-outline btn-small" data-view="' + esc(j.id) + '">Applicants (' + n + ')</button>' +
+        '<button class="btn btn-danger btn-small" data-delete="' + esc(j.id) + '">Delete</button>');
     }).join('') : '<p class="empty">You have not posted any jobs yet.</p>';
   }
 
   $('#jobList').addEventListener('click', async e => {
+    if (e.target.dataset.more) {
+      const j = jobs.find(x => String(x.id) === e.target.dataset.more);
+      if (j) showJob(j, '');
+    }
     if (e.target.dataset.view) {
       openPortalTab('applicants');
       $('#jobFilter').value = e.target.dataset.view;
@@ -179,7 +172,7 @@
   /* ---------- Profile ---------- */
   function fillProfile() {
     const f = $('#profileForm');
-    ['fullName', 'email', 'phone', 'company', 'designation', 'about']
+    ['fullName', 'email', 'phone', 'company', 'website', 'designation', 'about']
       .forEach(n => { f.elements[n].value = me[n] || ''; });
     f.elements.password.value = '';
   }
@@ -189,7 +182,7 @@
     const f = e.target, v = n => f.elements[n].value.trim();
     const pw = f.elements.password.value;
     if (pw && pw.length < 8) return toast('New password must be at least 8 characters.', 'error');
-    const body = { fullName: v('fullName'), phone: v('phone'), company: v('company'),
+    const body = { fullName: v('fullName'), phone: v('phone'), company: v('company'), website: v('website'),
                    designation: v('designation'), about: v('about') };
     if (pw) body.password = pw;
     const r = await api('/me', { method: 'PUT', body });
@@ -204,7 +197,7 @@
     const f = e.target, v = n => f.elements[n].value.trim();
     const r = await api('/auth/signup', { method: 'POST', body: {
       role: ROLE, fullName: v('fullName'), email: v('email'), password: f.elements.password.value,
-      phone: v('phone'), company: v('company'), designation: v('designation'), about: v('about') } });
+      phone: v('phone'), company: v('company'), website: v('website'), designation: v('designation'), about: v('about') } });
     if (r.error) return toast(r.error, 'error');
     f.reset();
     await show(true);

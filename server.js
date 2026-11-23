@@ -25,6 +25,36 @@ CREATE TABLE IF NOT EXISTS resets(token TEXT PRIMARY KEY, user_id INTEGER NOT NU
 CREATE INDEX IF NOT EXISTS ix_app_job ON applications(job_id); CREATE INDEX IF NOT EXISTS ix_app_cand ON applications(candidate_id); CREATE INDEX IF NOT EXISTS ix_job_rec ON jobs(recruiter_id);`);
 const q = (sql) => db.prepare(sql);
 q('DELETE FROM sessions WHERE expires<?').run(Date.now()); q('DELETE FROM resets WHERE expires<?').run(Date.now());
+const addCol = (t, c) => { if (!db.prepare(`PRAGMA table_info(${t})`).all().some((r) => r.name === c)) db.exec(`ALTER TABLE ${t} ADD COLUMN ${c} TEXT`); };
+addCol('jobs', 'experience'); addCol('jobs', 'qualification'); addCol('jobs', 'website'); addCol('users', 'website');
+
+// Sample listings from well-known companies (indicative, for demonstration). Disable with SEED_JOBS=0 in .env.
+const SEED = [
+  ['Infosys', 'https://www.infosys.com/careers/', 'Systems Engineer', 'Bengaluru, Pune, Hyderabad', '₹3.6 – 4.5 LPA', '0 – 1 years (freshers)', 'B.E./B.Tech/M.E./M.Tech/MCA/M.Sc in CS, IT or related, 60%+ throughout', 'Java, Python, SQL, Problem solving', 'Work with delivery teams to build, test and support enterprise software for global clients, with structured training in your first months.'],
+  ['Infosys', 'https://www.infosys.com/careers/', 'Specialist Programmer', 'Bengaluru', '₹9 – 11 LPA', '0 – 2 years', 'B.E./B.Tech in CS, IT or ECE; strong coding fundamentals', 'Data Structures, Algorithms, Java, C++', 'For candidates with strong problem-solving skills. Design and build complex software components and solve hard engineering problems for clients.'],
+  ['TCS', 'https://www.tcs.com/careers/india', 'Assistant System Engineer', 'Mumbai, Chennai, Kolkata, Pune', '₹3.4 – 3.6 LPA', '0 – 1 years (freshers)', 'B.E./B.Tech/MCA/M.Sc, 60%+ in 10th, 12th and graduation', 'Programming basics, SQL, Communication', 'Join an IT services project team, learn on the job and contribute to application development and maintenance for enterprise customers.'],
+  ['TCS', 'https://www.tcs.com/careers/india', 'Digital Developer', 'Hyderabad, Pune, Chennai', '₹7 LPA', '0 – 2 years', 'B.E./B.Tech/M.Tech in CS, IT or ECE', 'Java, Spring Boot, React, Cloud basics', 'Build modern digital products using cloud and web technologies as part of a product-focused delivery team.'],
+  ['Wipro', 'https://careers.wipro.com', 'Project Engineer', 'Bengaluru, Hyderabad, Pune', '₹3.5 – 6.5 LPA', '0 – 1 years (freshers)', 'B.E./B.Tech in CS, IT, ECE or EEE, 60%+ throughout', 'Programming, Databases, Testing, Communication', 'Support application development, testing and maintenance for Wipro clients while following a structured onboarding programme.'],
+  ['Wipro', 'https://careers.wipro.com', 'Cloud Engineer (Azure)', 'Chennai, Bengaluru', '₹8 – 14 LPA', '3 – 5 years', 'B.E./B.Tech in CS or IT; Azure certification preferred', 'Azure, Terraform, Kubernetes, CI/CD', 'Design and operate cloud infrastructure, automate deployments and improve reliability for enterprise workloads.'],
+  ['Microsoft', 'https://careers.microsoft.com', 'Software Engineer', 'Hyderabad, Bengaluru', '₹30 – 50 LPA', '0 – 3 years', "Bachelor's or Master's in Computer Science or equivalent practical experience", 'C#, TypeScript, Azure, Algorithms', 'Design, build and ship features for products used by millions. Work in a team that values code quality, testing and collaboration.'],
+  ['Microsoft', 'https://careers.microsoft.com', 'Program Manager', 'Hyderabad', '₹35 – 55 LPA', '4 – 7 years', "Bachelor's degree in Engineering, CS or a related field; MBA is a plus", 'Product thinking, Stakeholder management, Data analysis', 'Own the roadmap and delivery of a product area, working with engineering and design to define what gets built and why.'],
+  ['Google', 'https://www.google.com/about/careers/applications/', 'Software Engineer, Early Career', 'Bengaluru, Hyderabad', '₹35 – 55 LPA', '0 – 2 years', "Bachelor's degree in CS or related field, or equivalent experience", 'Data Structures, Algorithms, Python, C++', 'Develop software across the stack, from large-scale backend systems to user-facing features, in a collaborative engineering team.'],
+  ['Amazon', 'https://www.amazon.jobs', 'Software Development Engineer I', 'Bengaluru, Chennai', '₹28 – 45 LPA', '0 – 2 years', "Bachelor's degree in CS, Engineering or related field", 'Java, Data Structures, System design basics, AWS', 'Design and build scalable services, own components end to end and raise the bar on operational excellence.'],
+  ['Accenture', 'https://www.accenture.com/in-en/careers', 'Associate Software Engineer', 'Bengaluru, Pune, Mumbai', '₹4.5 – 6.5 LPA', '0 – 1 years (freshers)', 'Any graduate degree with strong aptitude; B.E./B.Tech preferred', 'Programming basics, Cloud basics, Communication', 'Join a client project team to develop, test and deploy applications while building skills through Accenture learning programmes.'],
+  ['Cognizant', 'https://careers.cognizant.com', 'Programmer Analyst Trainee', 'Chennai, Pune, Kolkata', '₹4 – 4.5 LPA', '0 – 1 years (freshers)', 'B.E./B.Tech/MCA/M.Sc in CS, IT or related, 60%+', 'Java, SQL, Web basics, Logical reasoning', 'Learn and contribute to application development and support for Cognizant clients after an initial training period.'],
+  ['HCLTech', 'https://www.hcltech.com/careers', 'Graduate Engineer Trainee', 'Noida, Chennai', '₹3.5 – 4.5 LPA', '0 – 1 years (freshers)', 'B.E./B.Tech in CS, IT, ECE or EEE', 'C/C++, Java, Networking basics', 'Start in a technology delivery team, rotate through training and take on real engineering tasks as you progress.'],
+  ['Tech Mahindra', 'https://careers.techmahindra.com', 'Software Engineer', 'Pune, Hyderabad', '₹3.5 – 5.5 LPA', '0 – 2 years', 'B.E./B.Tech/MCA in any relevant stream', 'Java, Python, Testing, Telecom basics', 'Build and support software for telecom and enterprise customers with mentoring from experienced engineers.'],
+  ['Zoho', 'https://www.zoho.com/careers/', 'Member Technical Staff', 'Chennai', '₹6 – 10 LPA', '0 – 2 years', 'Any degree; skills and problem solving matter more than marks', 'Java, JavaScript, Problem solving, Databases', 'Work on Zoho products from design to release, writing production code and owning features.'],
+  ['Flipkart', 'https://www.flipkartcareers.com', 'Data Analyst', 'Bengaluru', '₹12 – 20 LPA', '2 – 4 years', "Bachelor's in Engineering, Statistics, Maths or a related field", 'SQL, Python, Tableau, A/B testing', 'Turn marketplace data into insights that guide product, supply and growth decisions for a large e-commerce platform.'],
+];
+if (E.SEED_JOBS !== '0') {
+  SEED.forEach((s, i) => {
+    let u = q("SELECT id FROM users WHERE provider='seed' AND company=?").get(s[0]);
+    if (!u) u = { id: Number(q('INSERT INTO users(role,full_name,email,provider,company,website,created) VALUES(?,?,?,?,?,?,?)').run('recruiter', s[0] + ' Talent Acquisition', 'jobs@' + s[0].toLowerCase().replace(/[^a-z]/g, '') + '.seed', 'seed', s[0], s[1], Date.now()).lastInsertRowid) };
+    q('UPDATE users SET website=? WHERE id=?').run(s[1], u.id); q('UPDATE jobs SET website=? WHERE recruiter_id=?').run(s[1], u.id);
+    if (!q('SELECT 1 FROM jobs WHERE recruiter_id=? AND title=?').get(u.id, s[2])) q('INSERT INTO jobs(recruiter_id,company,title,location,salary,type,skills,description,created,experience,qualification,website) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)').run(u.id, s[0], s[2], s[3], s[4], 'Full-time', s[7], s[8], Date.now() - i * 1000, s[5], s[6], s[1]);
+  });
+}
 
 // ---- helpers ----
 const sha = (s) => crypto.createHash('sha256').update(s).digest('hex'), rnd = () => crypto.randomBytes(32).toString('hex');
@@ -39,8 +69,9 @@ const session = (res, uid, extra = []) => { const t = rnd(); q('INSERT INTO sess
 const current = (req) => { const t = cookies(req).lo_sid; if (!t) return null; return q('SELECT u.* FROM sessions s JOIN users u ON u.id=s.user_id WHERE s.token=? AND s.expires>?').get(sha(t), Date.now()) || null; };
 const isEmail = (e) => typeof e === 'string' && e.length < 255 && /^\S+@\S+\.\S+$/.test(e), isPass = (p) => typeof p === 'string' && p.length >= 8 && p.length < 200;
 const cl = (v, n) => String(v == null ? '' : v).trim().slice(0, n);
-const prof = (u) => ({ id: u.id, role: u.role, fullName: u.full_name, email: u.email, phone: u.phone || '', location: u.location || '', education: u.education || '', skills: u.skills || '', summary: u.summary || '', company: u.company || '', designation: u.designation || '', about: u.about || '', resumeName: u.resume_name || '', avatar: u.avatar || '', social: u.provider || '' });
+const prof = (u) => ({ id: u.id, role: u.role, fullName: u.full_name, email: u.email, phone: u.phone || '', location: u.location || '', education: u.education || '', skills: u.skills || '', summary: u.summary || '', company: u.company || '', website: u.website || '', designation: u.designation || '', about: u.about || '', resumeName: u.resume_name || '', avatar: u.avatar || '', social: u.provider || '' });
 const resumeErr = (r) => { if (!r || typeof r.name !== 'string' || typeof r.data !== 'string') return 'Please upload your resume.'; if (!/\.(pdf|doc|docx)$/i.test(r.name)) return 'Resume must be a PDF, DOC or DOCX file.'; if (!/^data:[\w.+\-\/]{1,100};base64,[A-Za-z0-9+\/=]+$/.test(r.data.length > 300 ? r.data.slice(0, 300) + 'AAAA' : r.data)) return 'Invalid resume file.'; if (r.data.length > 2.1e6) return 'Resume must be smaller than 1.5 MB.'; return ''; };
+const siteUrl = (v) => { v = cl(v, 200); if (!v) return ''; if (!/^https?:\/\//i.test(v)) v = 'https://' + v; try { const u = new URL(v); return /^https?:$/.test(u.protocol) && u.hostname.includes('.') ? u.href : null; } catch { return null; } };
 const meeting = (s) => { try { return s ? JSON.parse(s) : null; } catch { return null; } };
 
 // ---- API ----
@@ -61,15 +92,16 @@ async function api(req, res, url) {
     let rn = null, rd = null, company = null;
     if (role === 'candidate') { const e = resumeErr(b.resume); if (e) return send(res, 400, { error: e }); rn = cl(b.resume.name, 120); rd = b.resume.data; }
     else { company = cl(b.company, 100); if (company.length < 2) return send(res, 400, { error: 'Enter your company name.' }); }
+    const web = role === 'recruiter' ? siteUrl(b.website) : ''; if (web === null) return send(res, 400, { error: 'Enter a valid link, e.g. https://company.com/careers' });
     if (q('SELECT 1 FROM users WHERE email=?').get(email)) return send(res, 409, { error: 'An account with this email already exists.' });
-    const id = Number(q('INSERT INTO users(role,full_name,email,pass,phone,location,education,skills,summary,company,designation,about,resume_name,resume_data,created) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)')
-      .run(role, name, email, hash(b.password), cl(b.phone, 30), cl(b.location, 80), cl(b.education, 150), cl(b.skills, 300), cl(b.summary, 2000), company, cl(b.designation, 80), cl(b.about, 2000), rn, rd, Date.now()).lastInsertRowid);
+    const id = Number(q('INSERT INTO users(role,full_name,email,pass,phone,location,education,skills,summary,company,designation,about,resume_name,resume_data,created,website) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)')
+      .run(role, name, email, hash(b.password), cl(b.phone, 30), cl(b.location, 80), cl(b.education, 150), cl(b.skills, 300), cl(b.summary, 2000), company, cl(b.designation, 80), cl(b.about, 2000), rn, rd, Date.now(), web || null).lastInsertRowid);
     session(res, id); return send(res, 201, { user: prof(q('SELECT * FROM users WHERE id=?').get(id)) });
   }
   if (p === '/api/auth/login' && m === 'POST') {
     if (limited(ip)) return send(res, 429, { error: 'Too many attempts. Try again later.' });
     const b = await readBody(req), u = q('SELECT * FROM users WHERE email=?').get(cl(b.email, 255).toLowerCase());
-    if (!u || !verify(String(b.password || ''), u.pass)) return send(res, 401, { error: u && !u.pass ? `This account uses ${u.provider} sign-in.` : 'Wrong email or password.' });
+    if (!u || !verify(String(b.password || ''), u.pass)) return send(res, 401, { error: u && !u.pass ? (u.provider === 'seed' ? 'Wrong email or password.' : `This account uses ${u.provider} sign-in.`) : 'Wrong email or password.' });
     if (b.role && b.role !== u.role) return send(res, 403, { error: `This email is registered as a ${u.role}. Please use the ${u.role} portal.` });
     session(res, u.id); return send(res, 200, { user: prof(u) });
   }
@@ -96,22 +128,22 @@ async function api(req, res, url) {
     if (b.password && !isPass(b.password)) return send(res, 400, { error: 'New password must be at least 8 characters.' });
     let rn = me.resume_name, rd = me.resume_data;
     if (me.role === 'candidate' && b.resume) { const e = resumeErr(b.resume); if (e) return send(res, 400, { error: e }); rn = cl(b.resume.name, 120); rd = b.resume.data; }
-    let company = me.company; if (me.role === 'recruiter') { company = cl(b.company, 100); if (company.length < 2) return send(res, 400, { error: 'Enter your company name.' }); }
-    q('UPDATE users SET full_name=?,phone=?,location=?,education=?,skills=?,summary=?,company=?,designation=?,about=?,resume_name=?,resume_data=? WHERE id=?')
-      .run(name, cl(b.phone, 30), cl(b.location, 80), cl(b.education, 150), cl(b.skills, 300), cl(b.summary, 2000), company, cl(b.designation, 80), cl(b.about, 2000), rn, rd, me.id);
-    if (me.role === 'recruiter') q('UPDATE jobs SET company=? WHERE recruiter_id=?').run(company, me.id);
+    let company = me.company, website = me.website; if (me.role === 'recruiter') { company = cl(b.company, 100); if (company.length < 2) return send(res, 400, { error: 'Enter your company name.' }); website = siteUrl(b.website); if (website === null) return send(res, 400, { error: 'Enter a valid link, e.g. https://company.com/careers' }); }
+    q('UPDATE users SET full_name=?,phone=?,location=?,education=?,skills=?,summary=?,company=?,designation=?,about=?,resume_name=?,resume_data=?,website=? WHERE id=?')
+      .run(name, cl(b.phone, 30), cl(b.location, 80), cl(b.education, 150), cl(b.skills, 300), cl(b.summary, 2000), company, cl(b.designation, 80), cl(b.about, 2000), rn, rd, website || null, me.id);
+    if (me.role === 'recruiter') q('UPDATE jobs SET company=?, website=? WHERE recruiter_id=?').run(company, website || null, me.id);
     if (b.password) q('UPDATE users SET pass=? WHERE id=?').run(hash(b.password), me.id);
     return send(res, 200, { user: prof(q('SELECT * FROM users WHERE id=?').get(me.id)) });
   }
 
   // jobs
-  const jobOut = (j) => ({ id: j.id, company: j.company, title: j.title, location: j.location, salary: j.salary || '', type: j.type || 'Full-time', skills: j.skills || '', description: j.description || '', date: new Date(j.created).toISOString() });
-  if (p === '/api/jobs' && m === 'GET') return send(res, 200, { jobs: q('SELECT * FROM jobs ORDER BY created DESC LIMIT 500').all().map(jobOut) });
-  if (p === '/api/jobs/mine' && m === 'GET') { if (!need('recruiter')) return; return send(res, 200, { jobs: q('SELECT * FROM jobs WHERE recruiter_id=? ORDER BY created DESC').all(me.id).map(jobOut) }); }
+  const jobOut = (j) => ({ id: j.id, company: j.company, title: j.title, location: j.location, salary: j.salary || '', type: j.type || 'Full-time', skills: j.skills || '', description: j.description || '', experience: j.experience || '', qualification: j.qualification || '', website: j.website || '', sample: j.prov === 'seed', date: new Date(j.created).toISOString() });
+  if (p === '/api/jobs' && m === 'GET') return send(res, 200, { jobs: q('SELECT j.*, u.provider prov FROM jobs j JOIN users u ON u.id=j.recruiter_id ORDER BY j.created DESC LIMIT 500').all().map(jobOut) });
+  if (p === '/api/jobs/mine' && m === 'GET') { if (!need('recruiter')) return; return send(res, 200, { jobs: q('SELECT j.*, u.provider prov FROM jobs j JOIN users u ON u.id=j.recruiter_id WHERE j.recruiter_id=? ORDER BY j.created DESC').all(me.id).map(jobOut) }); }
   if (p === '/api/jobs' && m === 'POST') {
     if (!need('recruiter')) return; const b = await readBody(req), t = cl(b.title, 120), l = cl(b.location, 100);
     if (!t || !l) return send(res, 400, { error: 'Job title and location are required.' });
-    q('INSERT INTO jobs(recruiter_id,company,title,location,salary,type,skills,description,created) VALUES(?,?,?,?,?,?,?,?,?)').run(me.id, me.company || me.full_name, t, l, cl(b.salary, 60), TYPES.includes(b.type) ? b.type : 'Full-time', cl(b.skills, 300), cl(b.description, 3000), Date.now());
+    q('INSERT INTO jobs(recruiter_id,company,title,location,salary,type,skills,description,created,experience,qualification,website) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)').run(me.id, me.company || me.full_name, t, l, cl(b.salary, 60), TYPES.includes(b.type) ? b.type : 'Full-time', cl(b.skills, 300), cl(b.description, 3000), Date.now(), cl(b.experience, 80), cl(b.qualification, 200), me.website || null);
     return send(res, 201, { ok: true });
   }
   let x = p.match(/^\/api\/jobs\/(\d+)$/);

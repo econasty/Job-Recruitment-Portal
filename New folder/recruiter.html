@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Recruiter Portal - LinkedOut</title>
+<link rel="icon" href="logo.png">
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <header>
+    <a href="index.html"><img src="logo.png" alt="LinkedOut logo" class="logo"></a>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="#" id="logoutBtn" hidden>Logout</a>
+    </nav>
+  </header>
+
+  <!-- ===== Not logged in: login / create profile ===== -->
+  <section id="auth">
+    <h2>Recruiter Portal</h2>
+    <div class="tabs">
+      <button type="button" class="tab active" data-tab="login">Login</button>
+      <button type="button" class="tab" data-tab="register">Create Profile</button>
+    </div>
+
+    <form id="loginForm" data-panel="login">
+      <div class="field">
+        <label>Work email</label>
+        <input type="email" name="email" placeholder="you@company.com" required>
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input type="password" name="password" placeholder="Your password" required>
+      </div>
+      <button type="submit" class="btn">Login</button>
+      <a href="#" id="forgot" class="forgot">Forgot password?</a>
+    </form>
+
+    <form id="registerForm" class="wide" data-panel="register" hidden>
+      <div class="grid2">
+        <div class="field">
+          <label>Full name <span class="req">*</span></label>
+          <input type="text" name="fullName" required>
+        </div>
+        <div class="field">
+          <label>Work email <span class="req">*</span></label>
+          <input type="email" name="email" placeholder="you@company.com" required>
+        </div>
+        <div class="field">
+          <label>Password <span class="req">*</span></label>
+          <input type="password" name="password" placeholder="At least 8 characters" minlength="8" required>
+        </div>
+        <div class="field">
+          <label>Phone</label>
+          <input type="tel" name="phone" placeholder="+91 98765 43210">
+        </div>
+        <div class="field">
+          <label>Company <span class="req">*</span></label>
+          <input type="text" name="company" required>
+        </div>
+        <div class="field">
+          <label>Designation</label>
+          <input type="text" name="designation" placeholder="Technical Recruiter">
+        </div>
+        <div class="field full">
+          <label>Company website</label>
+          <input type="text" name="website" placeholder="https://www.yourcompany.com">
+        </div>
+        <div class="field full">
+          <label>About the company</label>
+          <textarea name="about" placeholder="What does your company do?"></textarea>
+        </div>
+      </div>
+      <button type="submit" class="btn">Create Profile</button>
+    </form>
+    <div class="social">
+      <p>or continue with</p>
+      <button type="button" class="btn" data-provider="google">Continue with Google</button>
+      <button type="button" class="btn" data-provider="linkedin">Continue with LinkedIn</button>
+    </div>
+  </section>
+
+  <!-- ===== Logged in: recruiter dashboard ===== -->
+  <div id="portal" hidden>
+    <section>
+      <h2 id="welcome">Welcome</h2>
+      <div class="row">
+        <div class="box stat"><h1 id="statJobs">0</h1><p>Jobs Posted</p></div>
+        <div class="box stat"><h1 id="statApplicants">0</h1><p>Applicants</p></div>
+        <div class="box stat"><h1 id="statMeetings">0</h1><p>Meetings Scheduled</p></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="tabs">
+        <button type="button" class="tab active" data-tab="jobs">My Jobs</button>
+        <button type="button" class="tab" data-tab="applicants">Applicants</button>
+        <button type="button" class="tab" data-tab="profile">Company Profile</button>
+      </div>
+
+      <!-- Create & manage jobs -->
+      <div data-panel="jobs">
+        <form id="jobForm" class="wide">
+          <h3>Create a job</h3>
+          <div class="grid2">
+            <div class="field">
+              <label>Job title <span class="req">*</span></label>
+              <input type="text" name="jobTitle" placeholder="Frontend Engineer" required>
+            </div>
+            <div class="field">
+              <label>Location <span class="req">*</span></label>
+              <input type="text" name="location" placeholder="Bengaluru / Remote" required>
+            </div>
+            <div class="field">
+              <label>Salary</label>
+              <input type="text" name="salary" placeholder="12-18 LPA">
+            </div>
+            <div class="field">
+              <label>Job type</label>
+              <select name="jobType">
+                <option>Full-time</option>
+                <option>Part-time</option>
+                <option>Internship</option>
+                <option>Contract</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Experience required</label>
+              <input type="text" name="experience" placeholder="0 - 2 years">
+            </div>
+            <div class="field">
+              <label>Qualification</label>
+              <input type="text" name="qualification" placeholder="B.E./B.Tech in CS or IT">
+            </div>
+            <div class="field full">
+              <label>Skills required (comma separated)</label>
+              <input type="text" name="skills" placeholder="React, JavaScript, CSS">
+            </div>
+            <div class="field full">
+              <label>Description</label>
+              <textarea name="description" placeholder="What will the person do?"></textarea>
+            </div>
+          </div>
+          <button type="submit" class="btn">Post Job</button>
+        </form>
+
+        <h3 class="list-title">Your posted jobs</h3>
+        <div class="cards" id="jobList"></div>
+      </div>
+
+      <!-- Applicants -->
+      <div data-panel="applicants" hidden>
+        <div class="toolbar">
+          <select id="jobFilter"></select>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Candidate</th><th>Job</th><th>Applied</th><th>Status / Meeting</th><th>Actions</th></tr>
+            </thead>
+            <tbody id="applicantRows"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Update profile -->
+      <div data-panel="profile" hidden>
+        <form id="profileForm" class="wide">
+          <div class="grid2">
+            <div class="field">
+              <label>Full name <span class="req">*</span></label>
+              <input type="text" name="fullName" required>
+            </div>
+            <div class="field">
+              <label>Work email</label>
+              <input type="email" name="email" disabled>
+            </div>
+            <div class="field">
+              <label>New password</label>
+              <input type="password" name="password" placeholder="Leave blank to keep current">
+            </div>
+            <div class="field">
+              <label>Phone</label>
+              <input type="tel" name="phone">
+            </div>
+            <div class="field">
+              <label>Company <span class="req">*</span></label>
+              <input type="text" name="company" required>
+            </div>
+            <div class="field">
+              <label>Designation</label>
+              <input type="text" name="designation">
+            </div>
+            <div class="field full">
+              <label>Company website</label>
+              <input type="text" name="website" placeholder="https://www.yourcompany.com">
+            </div>
+            <div class="field full">
+              <label>About the company</label>
+              <textarea name="about"></textarea>
+            </div>
+          </div>
+          <button type="submit" class="btn">Save Changes</button>
+        </form>
+      </div>
+    </section>
+  </div>
+
+  <!-- Schedule meeting popup -->
+  <div class="modal" id="meetingModal" hidden>
+    <form id="meetingForm">
+      <h3 id="meetingTitle">Schedule meeting</h3>
+      <div class="grid2">
+        <div class="field">
+          <label>Date <span class="req">*</span></label>
+          <input type="date" name="date" required>
+        </div>
+        <div class="field">
+          <label>Time <span class="req">*</span></label>
+          <input type="time" name="time" required>
+        </div>
+        <div class="field full">
+          <label>Mode</label>
+          <select name="mode">
+            <option>Video call</option>
+            <option>Phone call</option>
+            <option>In person</option>
+          </select>
+        </div>
+        <div class="field full">
+          <label>Meeting link or location</label>
+          <input type="text" name="link" placeholder="https://meet.google.com/... or office address">
+        </div>
+        <div class="field full">
+          <label>Note for the candidate</label>
+          <textarea name="notes" placeholder="Optional"></textarea>
+        </div>
+      </div>
+      <div class="actions modal-actions">
+        <button type="submit" class="btn btn-small">Schedule</button>
+        <button type="button" class="btn btn-outline btn-small" id="meetingCancel">Cancel</button>
+      </div>
+    </form>
+  </div>
+
+  <footer>
+    &copy; 2026 LinkedOut
+  </footer>
+
+  <script src="app.js"></script>
+  <script src="recruiter.js"></script>
+</body>
+</html>
