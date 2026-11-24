@@ -14,7 +14,8 @@ const PV = {
 };
 
 // ---- database ----
-const db = new DatabaseSync(path.resolve(__dirname, E.DB_FILE || 'linkedout.db'));
+const dbPath = E.DB_FILE || (E.VERCEL ? path.join('/tmp', 'linkedout.db') : path.join(__dirname, 'linkedout.db'));
+const db = new DatabaseSync(path.resolve(dbPath));
 db.exec(`PRAGMA journal_mode=WAL; PRAGMA foreign_keys=ON;
 CREATE TABLE IF NOT EXISTS users(id INTEGER PRIMARY KEY, role TEXT NOT NULL CHECK(role IN ('candidate','recruiter')), full_name TEXT NOT NULL, email TEXT UNIQUE NOT NULL, pass TEXT, provider TEXT, provider_id TEXT, avatar TEXT,
   phone TEXT, location TEXT, education TEXT, skills TEXT, summary TEXT, company TEXT, designation TEXT, about TEXT, resume_name TEXT, resume_data TEXT, created INTEGER NOT NULL);
