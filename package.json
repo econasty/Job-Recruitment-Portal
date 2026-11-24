@@ -2,7 +2,15 @@
   "name": "linkedout",
   "version": "1.0.0",
   "private": true,
-  "description": "LinkedOut job platform with a zero-dependency Node backend",
-  "scripts": { "start": "node server.js" },
-  "engines": { "node": ">=22.13" }
+  "description": "LinkedOut job platform with persistent Neon Postgres storage",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=22.13"
+  },
+  "dependencies": {
+    "drizzle-orm": "^0.45.4",
+    "pg": "^8.23.1"
+  }
 }
